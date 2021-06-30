@@ -16,7 +16,7 @@ class ApiManager {
     @required this.getUserToken,
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
-    bool isDevelopment = false,
+    this.isDevelopment = false,
   }) {
     if (isDevelopment) {
       _dio.interceptors.add(LogInterceptor(
@@ -28,6 +28,7 @@ class ApiManager {
   }
 
   final Dio _dio;
+  final bool isDevelopment;
   final BaseApiCacheDb apiCacheDB;
   final String Function() getUserToken;
   final String Function() defaultErrorMessage;
@@ -269,7 +270,13 @@ class ApiManager {
   }
 
   Future<Response<dynamic>> _getFromPersistenceCache(String hash) async {
-    return responseFromRawJson(await apiCacheDB.get(hash));
+    try {
+      return responseFromRawJson(await apiCacheDB.get(hash));
+    } catch (e) {
+      if (isDevelopment) print('ApiManger: _getFromPersistenceCache=> $e');
+
+      return null;
+    }
   }
 
   bool _validResponse(int statusCode) {

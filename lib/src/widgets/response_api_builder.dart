@@ -15,9 +15,10 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   final DataBuilder<T> data;
   final DataAndLoadingBuilder<T> dataAndLoading;
   final NoDataBuilder noData;
+  final String noDataMessage;
   final LoadingBuilder loading;
   final ErrorBuilder error;
-  final bool Function(T body) hasDataChecker;
+  final bool Function(T body) noDataChecker;
   final T defaultData;
 
   const ResponseApiBuilder({
@@ -28,8 +29,9 @@ class ResponseApiBuilder<T> extends StatelessWidget {
     this.noData,
     this.loading,
     this.error,
-    this.hasDataChecker,
+    this.noDataChecker,
     this.defaultData,
+    this.noDataMessage = 'No Data',
   }) : super(key: key);
 
   @override
@@ -67,24 +69,15 @@ class ResponseApiBuilder<T> extends StatelessWidget {
             ).setCenter();
           }
 
-          if ((!snapshot.hasData) || snapshot.data.isNoData) {
+          if ((snapshot.hasNoData()) ||
+              snapshot.data.isNoData ||
+              snapshot?.data?.data == null ||
+              ((noDataChecker ?? (_) => false)(snapshot?.data?.data))) {
             if (noData != null) {
               return noData(context);
             }
 
-            return const Text('No Data').setCenter();
-          }
-
-          //TODO: refactor
-          if (hasDataChecker != null) {
-            final bool hasData = hasDataChecker(snapshot.data.data);
-            if (hasData == false) {
-              if (noData != null) {
-                return noData(context);
-              }
-
-              return const Text('No Data').setCenter();
-            }
+            return Text(noDataMessage).setCenter();
           }
 
           return data(context, list);

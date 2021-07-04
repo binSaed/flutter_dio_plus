@@ -393,6 +393,7 @@ class ApiManager {
             networkErrorMessage(), null, defaultErrorMessage());
       }
       try {
+        //TODO accept from dev error parser
         responseBody = response?.data;
         const String responseErrorField = 'data';
         // error = ((responseBody[responseErrorField]?.isEmpty ?? false)

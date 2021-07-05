@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart' as path;
 
-extension Filex on File {
+extension FileX on File {
   String get name {
     if (this == null) return '';
 
@@ -15,5 +15,16 @@ extension Filex on File {
       this?.path,
       filename: this?.name,
     );
+  }
+}
+
+extension FilesX on List<File> {
+  Future<List<MultipartFile>> toMultipart() async {
+    final List<MultipartFile> multipartFiles = <MultipartFile>[];
+    for (final File file in (this ?? <File>[])) {
+      multipartFiles.add(await file.toMultipartFile());
+    }
+
+    return multipartFiles;
   }
 }

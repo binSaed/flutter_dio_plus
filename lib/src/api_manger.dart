@@ -74,6 +74,9 @@ class ApiManager {
         defaultErrorMessage(),
       );
     } catch (e) {
+      if (isDevelopment && !(e is NetworkApiException)) {
+        print('ApiManger: $e');
+      }
       return ResponseApi<T>.error(
         e,
         e?.response,

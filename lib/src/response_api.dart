@@ -33,9 +33,9 @@ class ResponseApi<T> {
   @override
   String toString() {
     if (status == ApiStatus.ERROR) {
-      return 'Status : $status \n Error : $error \nstatusCode : $statusCode';
+      return 'Status: $status \nError: $error \nstatusCode: $statusCode';
     }
-    return 'Status : $status \nData : $data \nstatusCode : $statusCode';
+    return 'Status: $status \nData: $data \nstatusCode: $statusCode';
   }
 }
 

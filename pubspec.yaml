@@ -1,6 +1,6 @@
 name: api_manger
 description: "A flutter package to API handling like a super boss 😎."
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/AbdOoSaed/api_manger
 
 environment:

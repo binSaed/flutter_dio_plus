@@ -414,7 +414,7 @@ class ApiManager {
       }
       try {
         responseBody = response?.data;
-        error = errorParser(responseBody);
+        error = errorParser(responseBody) ?? defaultErrorMessage();
       } catch (e) {
         throw NetworkApiException(error, response, defaultErrorMessage());
       }

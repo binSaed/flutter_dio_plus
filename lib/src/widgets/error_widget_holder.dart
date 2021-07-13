@@ -10,12 +10,12 @@ Widget errorWidgetHolder(
 }) =>
     Column(
       children: <Widget>[
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
         Text(
           error,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         ElevatedButton(
           onPressed: () => refresh(),
           style: ButtonStyle(
@@ -27,6 +27,6 @@ Widget errorWidgetHolder(
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
       ],
     ).setCenter();

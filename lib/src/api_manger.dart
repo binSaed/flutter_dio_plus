@@ -32,8 +32,7 @@ class ApiManager {
         requestHeader: true,
         requestBody: true,
         responseBody: true,
-        logPrint: (Object object) =>
-            debugPrint(object.toString(), wrapWidth: 600),
+        logPrint: print,
       ));
     }
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {

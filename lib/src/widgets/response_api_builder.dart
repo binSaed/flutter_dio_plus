@@ -39,7 +39,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   }) : super(key: key);
 
   void _refresh() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.scheduleFrameCallback((_) {
       updateNotifier.value = !updateNotifier.value;
     });
   }

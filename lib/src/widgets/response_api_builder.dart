@@ -1,86 +1,97 @@
 import 'package:api_manger/api_manger.dart';
 import 'package:api_manger/src/extensions/extensions.dart';
+import 'package:api_manger/src/utils/typedef.dart';
+import 'package:api_manger/src/widgets/error_widget_holder.dart';
+import 'package:api_manger/src/widgets/no_data_holder.dart';
 import 'package:api_manger/src/widgets/show_progress.dart';
 import 'package:flutter/material.dart';
 
-typedef NoDataBuilder = Widget Function(BuildContext context);
-typedef LoadingBuilder = Widget Function(BuildContext context);
-typedef ErrorBuilder = Widget Function(BuildContext context, String error);
-typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
-typedef DataAndLoadingBuilder<T> = Widget Function(
-    BuildContext context, T data, bool loading);
-
 class ResponseApiBuilder<T> extends StatelessWidget {
-  final Future<ResponseApi<T>> future;
-  final DataBuilder<T> data;
-  final DataAndLoadingBuilder<T> dataAndLoading;
-  final NoDataBuilder noData;
-  final String noDataMessage;
-  final LoadingBuilder loading;
-  final ErrorBuilder error;
-  final bool Function(T body) noDataChecker;
+  final ApiReq future;
   final T defaultData;
+  final DataBuilder<T> dataBuilder;
+  final DataAndLoadingBuilder<T> dataAndLoadingBuilder;
+  final NoDataBuilder noDataBuilder;
+  final LoadingBuilder loadingBuilder;
+  final ErrorBuilder errorBuilder;
+  final NoDataChecker noDataChecker;
+  final String noDataMessage;
+  final String retryMessage;
 
-  const ResponseApiBuilder({
+  /// required if u need to retry failed requests when internet comeback
+  /// if apiManager!=null auto refresh error requests will run
+  final ApiManager apiManager;
+  final ValueNotifier<bool> updateNotifier = ValueNotifier(false);
+
+  ResponseApiBuilder({
     Key key,
     @required this.future,
-    this.data,
-    this.dataAndLoading,
-    this.noData,
-    this.loading,
-    this.error,
+    this.apiManager,
+    this.dataBuilder,
+    this.dataAndLoadingBuilder,
+    this.noDataBuilder,
+    this.loadingBuilder = loadingWidgetHolder,
+    this.errorBuilder,
     this.noDataChecker,
     this.defaultData,
     this.noDataMessage = 'No Data',
+    this.retryMessage = 'Try again',
   }) : super(key: key);
+
+  void _refresh() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updateNotifier.value = !updateNotifier.value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ResponseApi<T>>(
-        future: future,
-        builder:
-            (BuildContext context, AsyncSnapshot<ResponseApi<T>> snapshot) {
-          final T list = snapshot?.data?.data ?? defaultData;
-          final bool isDone = snapshot.connectionState == ConnectionState.done;
-          if (dataAndLoading != null) {
-            return dataAndLoading(context, list, !isDone);
-          }
-          if (!isDone) {
-            if (loading != null) {
-              return loading(context);
-            }
-            return ShowProgress().setCenter();
-          }
+    return ValueListenableBuilder<bool>(
+        valueListenable: updateNotifier,
+        builder: (context, value, _) {
+          return FutureBuilder<ResponseApi<T>>(
+              key: UniqueKey(),
+              future: future(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<ResponseApi<T>> snapshot) {
+                final T list = snapshot?.data?.data ?? defaultData;
+                final bool isDone = snapshot.isDoneX;
 
-          if (snapshot.hasError || (snapshot?.data?.hasError ?? false)) {
-            final String _error =
-                (snapshot.error ?? snapshot?.data?.error ?? '').toString();
+                if (snapshot.hasErrorX && apiManager != null) {
+                  apiManager.addRefreshListener(_refresh);
+                }
 
-            if (error != null) {
-              return error(context, _error);
-            }
+                if (snapshot.hasErrorX) {
+                  final String _error = snapshot.errorX;
+                  if (errorBuilder != null) {
+                    errorBuilder(context, _error, _refresh);
+                  }
+                  return errorWidgetHolder(
+                    context,
+                    _error,
+                    _refresh,
+                    retryMessage: retryMessage,
+                  );
+                }
+                apiManager.removeRefreshListener(_refresh);
+                if (dataAndLoadingBuilder != null) {
+                  return dataAndLoadingBuilder(
+                      context, list, !isDone, _refresh);
+                }
 
-            return Text(
-              _error,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.red[600],
-              ),
-            ).setCenter();
-          }
+                if (!isDone) {
+                  return loadingBuilder(context);
+                }
 
-          if ((snapshot.hasNoData()) ||
-              snapshot.data.isNoData ||
-              snapshot?.data?.data == null ||
-              ((noDataChecker ?? (_) => false)(snapshot?.data?.data))) {
-            if (noData != null) {
-              return noData(context);
-            }
+                if (snapshot.isNoData(noDataChecker)) {
+                  if (noDataBuilder == null) {
+                    return noDataWidgetHolder(noDataMessage);
+                  }
+                  return noDataBuilder(context, _refresh);
+                }
 
-            return Text(noDataMessage).setCenter();
-          }
-
-          return data(context, list);
+                return dataBuilder(context, list, _refresh);
+              });
         });
   }
 }

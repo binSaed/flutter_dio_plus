@@ -6,8 +6,15 @@ import 'package:api_manger/src/base_cache_api_db.dart';
 import 'package:api_manger/src/future_queue.dart';
 import 'package:api_manger/src/network_api_exception.dart';
 import 'package:api_manger/src/response_api.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+
+class _RefreshListenerEntry extends LinkedListEntry<_RefreshListenerEntry> {
+  _RefreshListenerEntry(this.listener);
+
+  final VoidCallback listener;
+}
 
 class ApiManager {
   ApiManager(
@@ -18,24 +25,86 @@ class ApiManager {
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
     this.isDevelopment = false,
+    this.onNetworkChanged,
   }) {
     if (isDevelopment) {
       _dio.interceptors.add(LogInterceptor(
         requestHeader: true,
         requestBody: true,
         responseBody: true,
+        logPrint: (object) => debugPrint(object.toString(), wrapWidth: 600),
       ));
     }
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      final bool _connected = result != ConnectivityResult.none;
+      if (onNetworkChanged != null) onNetworkChanged(_connected);
+      if (_connected) notifyRefreshListeners();
+    });
   }
 
   final Dio _dio;
+
+  /// if true we will print some information to know what happens
   final bool isDevelopment;
+
+  /// used to make persistenceCache
   final BaseApiCacheDb apiCacheDB;
+
+  ///send as bearer token when auth==true
   final String Function() getUserToken;
+
+  /// return when SocketException
   final String Function() defaultErrorMessage;
+
+  /// return when SocketException
   final String Function() networkErrorMessage;
+
+  /// if ur backend used the same error structure
+  /// u need to define how to parsing it
+  /// also, u can override it in every request
   final String Function(dynamic body) errorGeneralParser;
-  final Map<String, dynamic> _httpGETCaching = HashMap<String, dynamic>();
+
+  /// listen to network connectivity
+  /// true == connected to wifi or mobile network
+  /// false == no internet
+  final ValueChanged<bool> onNetworkChanged;
+
+  /// used to save response in memory
+  final Map<String, dynamic> _httpCaching = HashMap<String, dynamic>();
+
+  /// used to retry failed ResponseApiBuilder requests when internet comeback
+  final LinkedList<_RefreshListenerEntry> _refreshListeners =
+      LinkedList<_RefreshListenerEntry>();
+
+  void addRefreshListener(VoidCallback listener) {
+    _refreshListeners.add(_RefreshListenerEntry(listener));
+  }
+
+  void removeRefreshListener(VoidCallback listener) {
+    for (final _RefreshListenerEntry entry in _refreshListeners) {
+      if (entry.listener == listener) {
+        entry.unlink();
+        return;
+      }
+    }
+  }
+
+  void notifyRefreshListeners() {
+    if (_refreshListeners.isEmpty) return;
+
+    final List<_RefreshListenerEntry> localListeners =
+        List<_RefreshListenerEntry>.from(_refreshListeners);
+
+    for (final _RefreshListenerEntry entry in localListeners) {
+      try {
+        if (entry.list != null) entry.listener();
+      } catch (exception, _) {
+        if (isDevelopment) {
+          print('ApiManger: notifyRefreshListeners=> $exception');
+        }
+      }
+    }
+  }
 
   Map<String, String> headersWithBearerToken(String token,
       {Map<String, String> otherHeaders = const <String, String>{}}) {
@@ -287,7 +356,7 @@ class ApiManager {
   }
 
   dynamic _getFromMemoryCache(String hash) {
-    return _httpGETCaching[hash];
+    return _httpCaching[hash];
   }
 
   Future<Response<dynamic>> _getFromPersistenceCache(String hash) async {
@@ -306,7 +375,7 @@ class ApiManager {
 
   void _saveToMemoryCache(Response<dynamic> res, String hash) {
     if (_validResponse(res.statusCode)) {
-      _httpGETCaching[hash] = res;
+      _httpCaching[hash] = res;
     }
   }
 

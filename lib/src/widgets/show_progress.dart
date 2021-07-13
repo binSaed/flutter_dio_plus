@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:api_manger/src/extensions/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,3 +18,5 @@ class ShowProgress extends StatelessWidget {
     );
   }
 }
+
+Widget loadingWidgetHolder(_) => ShowProgress().setCenter();

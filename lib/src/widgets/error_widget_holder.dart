@@ -11,17 +11,22 @@ Widget errorWidgetHolder(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        SizedBox(height: 2),
         Text(
           error,
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 4),
         ElevatedButton(
           onPressed: () => refresh(),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+                Theme.of(context).primaryColor),
+          ),
           child: Text(
             retryMessage,
             textAlign: TextAlign.center,
           ),
-        )
+        ), SizedBox(height: 2),
       ],
     );

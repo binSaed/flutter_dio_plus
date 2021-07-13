@@ -7,7 +7,7 @@ import 'package:api_manger/src/widgets/show_progress.dart';
 import 'package:flutter/material.dart';
 
 class ResponseApiBuilder<T> extends StatelessWidget {
-  final ApiReq future;
+  final ApiReq<T> future;
   final T defaultData;
   final DataBuilder<T> dataBuilder;
   final DataAndLoadingBuilder<T> dataAndLoadingBuilder;
@@ -21,7 +21,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   /// required if u need to retry failed requests when internet comeback
   /// if apiManager!=null auto refresh error requests will run
   final ApiManager apiManager;
-  final ValueNotifier<bool> updateNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> updateNotifier = ValueNotifier<bool>(false);
 
   ResponseApiBuilder({
     Key key,
@@ -48,7 +48,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
         valueListenable: updateNotifier,
-        builder: (context, value, _) {
+        builder: (BuildContext context, bool value, _) {
           return FutureBuilder<ResponseApi<T>>(
               key: UniqueKey(),
               future: future(),

@@ -14,7 +14,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   final NoDataBuilder noDataBuilder;
   final LoadingBuilder loadingBuilder;
   final ErrorBuilder errorBuilder;
-  final NoDataChecker noDataChecker;
+  final NoDataChecker<T> noDataChecker;
   final String noDataMessage;
   final String retryMessage;
 

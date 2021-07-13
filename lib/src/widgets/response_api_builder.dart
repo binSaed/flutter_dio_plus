@@ -73,7 +73,11 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                     retryMessage: retryMessage,
                   );
                 }
-                apiManager.removeRefreshListener(_refresh);
+
+                if (apiManager != null) {
+                  apiManager.removeRefreshListener(_refresh);
+                }
+
                 if (dataAndLoadingBuilder != null) {
                   return dataAndLoadingBuilder(
                       context, list, !isDone, _refresh);

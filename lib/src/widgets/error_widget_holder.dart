@@ -1,3 +1,4 @@
+import 'package:api_manger/src/extensions/extensions.dart';
 import 'package:api_manger/src/utils/typedef.dart';
 import 'package:flutter/material.dart';
 
@@ -8,15 +9,13 @@ Widget errorWidgetHolder(
   @required String retryMessage,
 }) =>
     Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(height: 2),
+      children: <Widget>[
+        const SizedBox(height: 2),
         Text(
           error,
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         ElevatedButton(
           onPressed: () => refresh(),
           style: ButtonStyle(
@@ -27,6 +26,7 @@ Widget errorWidgetHolder(
             retryMessage,
             textAlign: TextAlign.center,
           ),
-        ), SizedBox(height: 2),
+        ),
+        const SizedBox(height: 2),
       ],
-    );
+    ).setCenter();

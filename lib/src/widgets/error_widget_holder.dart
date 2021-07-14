@@ -9,6 +9,7 @@ Widget errorWidgetHolder(
   @required String retryMessage,
 }) =>
     Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         const SizedBox(height: 4),
         Text(

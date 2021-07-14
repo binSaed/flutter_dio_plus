@@ -17,6 +17,8 @@ class _RefreshListenerEntry extends LinkedListEntry<_RefreshListenerEntry> {
 }
 
 class ApiManager {
+  bool _firstCall = true;
+
   ApiManager(
     this._dio, {
     @required this.errorGeneralParser,
@@ -35,7 +37,14 @@ class ApiManager {
         logPrint: print,
       ));
     }
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    Connectivity()
+        .onConnectivityChanged
+        .distinct((previous, next) => previous == next)
+        .listen((ConnectivityResult result) {
+      if (_firstCall) {
+        _firstCall = false;
+        return;
+      }
       final bool _connected = result != ConnectivityResult.none;
       if (onNetworkChanged != null) onNetworkChanged(_connected);
       if (_connected) notifyRefreshListeners();

@@ -56,6 +56,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                   AsyncSnapshot<ResponseApi<T>> snapshot) {
                 final T list = snapshot?.data?.data ?? defaultData;
                 final bool isDone = snapshot.isDoneX;
+                final bool isLoading = !isDone;
 
                 if (snapshot.hasErrorX && apiManager != null) {
                   apiManager.addRefreshListener(_refresh);
@@ -78,23 +79,32 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                   apiManager.removeRefreshListener(_refresh);
                 }
 
-                  if (snapshot.isNoData(noDataChecker)) {
+                if (isDone && snapshot.isNoData(noDataChecker)) {
                   if (noDataBuilder == null) {
                     return noDataWidgetHolder(noDataMessage);
                   }
                   return noDataBuilder(context, _refresh);
                 }
-                
+
+                if (isLoading) {
+                  if (dataAndLoadingBuilder != null) {
+                    return dataAndLoadingBuilder(
+                        context, list, !isDone, _refresh);
+                  }
+                  return loadingBuilder(context);
+                }
+
+                if (snapshot.isNoData(noDataChecker)) {
+                  if (noDataBuilder == null) {
+                    return noDataWidgetHolder(noDataMessage);
+                  }
+                  return noDataBuilder(context, _refresh);
+                }
+
                 if (dataAndLoadingBuilder != null) {
                   return dataAndLoadingBuilder(
                       context, list, !isDone, _refresh);
                 }
-
-                if (!isDone) {
-                  return loadingBuilder(context);
-                }
-
-
 
                 return dataBuilder(context, list, _refresh);
               });

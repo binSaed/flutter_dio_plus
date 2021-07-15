@@ -78,6 +78,13 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                   apiManager.removeRefreshListener(_refresh);
                 }
 
+                  if (snapshot.isNoData(noDataChecker)) {
+                  if (noDataBuilder == null) {
+                    return noDataWidgetHolder(noDataMessage);
+                  }
+                  return noDataBuilder(context, _refresh);
+                }
+                
                 if (dataAndLoadingBuilder != null) {
                   return dataAndLoadingBuilder(
                       context, list, !isDone, _refresh);
@@ -87,12 +94,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                   return loadingBuilder(context);
                 }
 
-                if (snapshot.isNoData(noDataChecker)) {
-                  if (noDataBuilder == null) {
-                    return noDataWidgetHolder(noDataMessage);
-                  }
-                  return noDataBuilder(context, _refresh);
-                }
+
 
                 return dataBuilder(context, list, _refresh);
               });

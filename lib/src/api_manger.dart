@@ -37,10 +37,7 @@ class ApiManager {
         logPrint: print,
       ));
     }
-    Connectivity()
-        .onConnectivityChanged
-        .distinct((previous, next) => previous == next)
-        .listen((ConnectivityResult result) {
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (_firstCall) {
         _firstCall = false;
         return;

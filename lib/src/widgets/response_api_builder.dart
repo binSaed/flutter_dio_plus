@@ -50,7 +50,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
         valueListenable: updateNotifier,
         builder: (BuildContext context, bool value, _) {
           return FutureBuilder<ResponseApi<T>>(
-              key: UniqueKey(),
+              key: ValueKey<Future<ResponseApi<T>>>(future()),
               future: future(),
               builder: (BuildContext context,
                   AsyncSnapshot<ResponseApi<T>> snapshot) {

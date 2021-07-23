@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:api_manger/src/api_util.dart';
@@ -9,11 +10,21 @@ import 'package:api_manger/src/response_api.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 class _RefreshListenerEntry extends LinkedListEntry<_RefreshListenerEntry> {
   _RefreshListenerEntry(this.listener);
 
   final VoidCallback listener;
+}
+
+// Must be top-level function
+_parseAndDecode(String response) {
+  return jsonDecode(response);
+}
+
+_parseJsonCompute(String text) {
+  return compute(_parseAndDecode, text);
 }
 
 class ApiManager {
@@ -27,6 +38,10 @@ class ApiManager {
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
     this.isDevelopment = false,
+
+    /// if largeResponse==true package will parse response in another isolate(Thread)
+    /// may take much time but it will improve rendering performance
+    bool largeResponse = false,
     this.onNetworkChanged,
   }) {
     if (isDevelopment) {
@@ -37,6 +52,11 @@ class ApiManager {
         logPrint: print,
       ));
     }
+    if (largeResponse) {
+      (_dio.transformer as DefaultTransformer).jsonDecodeCallback =
+          _parseJsonCompute;
+    }
+
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (_firstCall) {
         _firstCall = false;

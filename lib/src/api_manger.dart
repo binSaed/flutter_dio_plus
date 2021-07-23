@@ -19,11 +19,11 @@ class _RefreshListenerEntry extends LinkedListEntry<_RefreshListenerEntry> {
 }
 
 // Must be top-level function
-_parseAndDecode(String response) {
+dynamic _parseAndDecode(String response) {
   return jsonDecode(response);
 }
 
-_parseJsonCompute(String text) {
+Future<dynamic> _parseJsonCompute(String text) {
   return compute(_parseAndDecode, text);
 }
 

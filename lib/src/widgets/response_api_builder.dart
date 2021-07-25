@@ -49,9 +49,12 @@ class ResponseApiBuilder<T> extends StatelessWidget {
     return ValueListenableBuilder<bool>(
         valueListenable: updateNotifier,
         builder: (BuildContext context, bool value, _) {
+          //to call _future one time
+          final Future<ResponseApi<T>> _future = future();
+
           return FutureBuilder<ResponseApi<T>>(
-              key: ValueKey<Future<ResponseApi<T>>>(future()),
-              future: future(),
+              key: ValueKey<Future<ResponseApi<T>>>(_future),
+              future: _future,
               builder: (BuildContext context,
                   AsyncSnapshot<ResponseApi<T>> snapshot) {
                 final T list = snapshot?.data?.data ?? defaultData;

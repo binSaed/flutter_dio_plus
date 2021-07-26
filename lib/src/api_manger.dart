@@ -370,13 +370,16 @@ class ApiManager {
   }
 
   T parse<T>(dynamic body, T Function(dynamic body) parserFunction) {
-    if (parserFunction == null) {
-      return body;
-    }
+    if (parserFunction == null) return body;
 
     try {
       return parserFunction(body);
     } catch (e) {
+      if (e is FormatException || e is TypeError) {
+        if (isDevelopment) print('ApiManger: parserFunction=> $e');
+
+        return throw NetworkApiException(null, null, defaultErrorMessage());
+      }
       throw NetworkApiException(e.toString(), null, defaultErrorMessage());
     }
   }

@@ -7,15 +7,15 @@ extension AsyncSnapshotResponseApiX<T> on AsyncSnapshot<ResponseApi<T>> {
   }
 
   bool isNoData(bool Function(T body) noDataChecker) {
-    return (this.hasNoData()) ||
-        this.data.isNoData ||
+    return (hasNoData()) ||
+        data.isNoData ||
         this?.data?.data == null ||
         ((noDataChecker ?? (_) => false)(this?.data?.data));
   }
 
-  bool get isDoneX => this.connectionState == ConnectionState.done;
+  bool get isDoneX => connectionState == ConnectionState.done;
 
-  bool get hasErrorX => this.hasError || (this?.data?.hasError ?? false);
+  bool get hasErrorX => hasError || (this?.data?.hasError ?? false);
 
-  String get errorX => (this.error ?? this?.data?.error ?? '').toString();
+  String get errorX => (error ?? this?.data?.error ?? '').toString();
 }

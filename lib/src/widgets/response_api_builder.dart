@@ -57,60 +57,72 @@ class ResponseApiBuilder<T> extends StatelessWidget {
               future: _future,
               builder: (BuildContext context,
                   AsyncSnapshot<ResponseApi<T>> snapshot) {
-                final T list = snapshot?.data?.data ?? defaultData;
+                final T data = snapshot?.data?.data ?? defaultData;
                 final bool isDone = snapshot.isDoneX;
                 final bool isLoading = !isDone;
 
                 if (snapshot.hasErrorX && apiManager != null) {
                   apiManager.addRefreshListener(_refresh);
                 }
-
-                if (snapshot.hasErrorX) {
-                  final String _error = snapshot.errorX;
-                  if (errorBuilder != null) {
-                    errorBuilder(context, _error, _refresh);
-                  }
-                  return errorWidgetHolder(
-                    context,
-                    _error,
-                    _refresh,
-                    retryMessage: retryMessage,
-                  );
-                }
-
-                if (apiManager != null) {
-                  apiManager.removeRefreshListener(_refresh);
-                }
-
-                if (isDone && snapshot.isNoData(noDataChecker)) {
-                  if (noDataBuilder == null) {
-                    return noDataWidgetHolder(noDataMessage);
-                  }
-                  return noDataBuilder(context, _refresh);
-                }
-
-                if (isLoading) {
-                  if (dataAndLoadingBuilder != null) {
-                    return dataAndLoadingBuilder(
-                        context, list, !isDone, _refresh);
-                  }
-                  return loadingBuilder(context);
-                }
-
-                if (snapshot.isNoData(noDataChecker)) {
-                  if (noDataBuilder == null) {
-                    return noDataWidgetHolder(noDataMessage);
-                  }
-                  return noDataBuilder(context, _refresh);
-                }
-
-                if (dataAndLoadingBuilder != null) {
-                  return dataAndLoadingBuilder(
-                      context, list, !isDone, _refresh);
-                }
-
-                return dataBuilder(context, list, _refresh);
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: _getWidget(
+                    context: context,
+                    data: data,
+                    snapshot: snapshot,
+                    isDone: isDone,
+                    isLoading: isLoading,
+                  ),
+                );
               });
         });
+  }
+
+  Widget _getWidget(
+      {BuildContext context,
+      AsyncSnapshot<ResponseApi<T>> snapshot,
+      bool isDone,
+      bool isLoading,
+      T data}) {
+    if (snapshot.hasErrorX) {
+      return errorWidgetHolder(
+        context,
+        snapshot.errorX,
+        _refresh,
+        retryMessage: retryMessage,
+        errorBuilder: errorBuilder,
+      );
+    }
+
+    if (apiManager != null) {
+      apiManager.removeRefreshListener(_refresh);
+    }
+
+    if (isDone && snapshot.isNoData(noDataChecker)) {
+      if (noDataBuilder == null) {
+        return noDataWidgetHolder(noDataMessage);
+      }
+      return noDataBuilder(context, _refresh);
+    }
+
+    if (isLoading) {
+      if (dataAndLoadingBuilder != null) {
+        return dataAndLoadingBuilder(context, data, !isDone, _refresh);
+      }
+      return loadingBuilder(context);
+    }
+
+    if (snapshot.isNoData(noDataChecker)) {
+      if (noDataBuilder == null) {
+        return noDataWidgetHolder(noDataMessage);
+      }
+      return noDataBuilder(context, _refresh);
+    }
+
+    if (dataAndLoadingBuilder != null) {
+      return dataAndLoadingBuilder(context, data, !isDone, _refresh);
+    }
+
+    return dataBuilder(context, data, _refresh);
   }
 }

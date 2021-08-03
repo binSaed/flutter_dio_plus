@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
@@ -77,7 +78,7 @@ class ApiManager {
   final BaseApiCacheDb apiCacheDB;
 
   ///send as bearer token when auth==true
-  final String Function() getUserToken;
+  final FutureOr<String> Function() getUserToken;
 
   /// return when SocketException
   final String Function() defaultErrorMessage;
@@ -437,7 +438,7 @@ class ApiManager {
   }) async {
     final Map<String, String> _headers = <String, String>{
       ...headers,
-      ...auth ? _tokenHeader() : <String, String>{}
+      ...auth ? await _tokenHeader() : <String, String>{}
     };
     final String cacheHash = getCacheHash(url, method, _headers, body: body);
     try {
@@ -496,8 +497,8 @@ class ApiManager {
     return null;
   }
 
-  Map<String, String> _tokenHeader() {
-    final String token = getUserToken();
+  FutureOr<Map<String, String>> _tokenHeader() async {
+    final String token = await getUserToken();
     final String bearerToken = 'Bearer $token';
     return <String, String>{'Authorization': bearerToken};
   }

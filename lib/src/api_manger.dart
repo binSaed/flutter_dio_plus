@@ -40,9 +40,9 @@ class ApiManager {
     @required this.networkErrorMessage,
     this.isDevelopment = false,
 
-    /// if largeResponse==true package will parse response in another isolate(Thread)
+    /// if response body Length > largeResponseLength package will parse response in another isolate(Thread)
     /// may take much time but it will improve rendering performance
-    bool largeResponse = false,
+    int largeResponseLength = 100000,
     this.onNetworkChanged,
   }) {
     if (isDevelopment) {
@@ -53,10 +53,11 @@ class ApiManager {
         logPrint: print,
       ));
     }
-    if (largeResponse) {
-      (_dio.transformer as DefaultTransformer).jsonDecodeCallback =
-          _parseJsonCompute;
-    }
+
+    (_dio.transformer as DefaultTransformer).jsonDecodeCallback = (text) {
+      if (text.length > largeResponseLength) return _parseJsonCompute(text);
+      return _parseAndDecode(text);
+    };
 
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (_firstCall) {

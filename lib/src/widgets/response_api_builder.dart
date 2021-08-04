@@ -65,7 +65,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                   apiManager.addRefreshListener(_refresh);
                 }
                 return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 300),
                   child: _getWidget(
                     context: context,
                     data: data,

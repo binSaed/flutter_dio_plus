@@ -377,7 +377,7 @@ class ApiManager {
     try {
       return parserFunction(body);
     } catch (e) {
-      if (e is FormatException || e is TypeError) {
+      if (e is FormatException || e is TypeError || e is NoSuchMethodError) {
         if (isDevelopment) print('ApiManger: parserFunction=> $e');
 
         return throw NetworkApiException(null, null, defaultErrorMessage());

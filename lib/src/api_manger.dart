@@ -60,11 +60,13 @@ class ApiManager {
     };
 
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      final bool _connected = result != ConnectivityResult.none;
       if (_firstCall) {
         _firstCall = false;
-        return;
+
+        if (_connected) return;
       }
-      final bool _connected = result != ConnectivityResult.none;
+
       if (onNetworkChanged != null) onNetworkChanged(_connected);
       if (_connected) notifyRefreshListeners();
     });

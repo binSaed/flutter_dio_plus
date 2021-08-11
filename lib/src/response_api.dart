@@ -4,11 +4,11 @@ import 'package:dio/dio.dart';
 class ResponseApi<T> {
   ResponseApi.success(this.data, this.response,
       [this._defaultErrorMessage = 'error'])
-      : status = ApiStatus.SUCCESS;
+      : status = ApiStatus.success;
 
   ResponseApi.error(this._error, this.response,
       [this._defaultErrorMessage = 'error'])
-      : status = ApiStatus.ERROR;
+      : status = ApiStatus.error;
 
   T data;
 
@@ -22,7 +22,9 @@ class ResponseApi<T> {
 
   ApiStatus status;
 
-  bool get hasError => status == ApiStatus.ERROR;
+  bool get isSuccess => status == ApiStatus.success;
+
+  bool get hasError => status == ApiStatus.error;
 
   bool get isNoData => data == null;
 
@@ -32,11 +34,11 @@ class ResponseApi<T> {
 
   @override
   String toString() {
-    if (status == ApiStatus.ERROR) {
+    if (status == ApiStatus.error) {
       return 'Status: $status \nError: $error \nstatusCode: $statusCode';
     }
     return 'Status: $status \nData: $data \nstatusCode: $statusCode';
   }
 }
 
-enum ApiStatus { SUCCESS, ERROR }
+enum ApiStatus { success, error }

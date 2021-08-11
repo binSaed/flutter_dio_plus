@@ -8,10 +8,10 @@ extension WidgetX on Widget {
   }
 
   Widget setWidth(double width) {
-    return Container(width: width, child: this);
+    return SizedBox(width: width, child: this);
   }
 
   Widget setHeight(double height) {
-    return Container(height: height, child: this);
+    return SizedBox(height: height, child: this);
   }
 }

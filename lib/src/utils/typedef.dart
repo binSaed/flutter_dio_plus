@@ -10,6 +10,7 @@ typedef ErrorBuilder = Widget Function(
     BuildContext context, String error, Refresh refresh);
 typedef DataBuilder<T> = Widget Function(
     BuildContext context, T data, Refresh refresh);
+typedef RefreshCallBack = void Function(BuildContext context, Refresh refresh);
 typedef DataAndLoadingBuilder<T> = Widget Function(
     BuildContext context, T data, bool loading, Refresh refresh);
 

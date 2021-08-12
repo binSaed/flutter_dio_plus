@@ -10,6 +10,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
   final ApiReq<T> future;
   final T defaultData;
   final DataBuilder<T> dataBuilder;
+  final RefreshCallBack refreshCallBack;
   final DataAndLoadingBuilder<T> dataAndLoadingBuilder;
   final NoDataBuilder noDataBuilder;
   final LoadingBuilder loadingBuilder;
@@ -31,6 +32,7 @@ class ResponseApiBuilder<T> extends StatelessWidget {
     this.dataAndLoadingBuilder,
     this.noDataBuilder,
     this.loadingBuilder = loadingWidgetHolder,
+    this.refreshCallBack,
     this.errorBuilder,
     this.noDataChecker,
     this.defaultData,
@@ -64,6 +66,8 @@ class ResponseApiBuilder<T> extends StatelessWidget {
                 if (snapshot.hasErrorX && apiManager != null) {
                   apiManager.addRefreshListener(_refresh);
                 }
+                if (refreshCallBack != null) refreshCallBack(context, _refresh);
+
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: _getWidget(

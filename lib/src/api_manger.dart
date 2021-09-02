@@ -35,7 +35,7 @@ class ApiManager {
     this._dio, {
     @required this.errorGeneralParser,
     @required this.apiCacheDB,
-    @required this.getUserToken,
+    @required this.getAuthHeader,
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
     this.isDevelopment = false,
@@ -80,8 +80,8 @@ class ApiManager {
   /// used to make persistenceCache
   final BaseApiCacheDb apiCacheDB;
 
-  ///send as bearer token when auth==true
-  final FutureOr<String> Function() getUserToken;
+  ///send when auth=true
+  final FutureOr<Map<String, String>> Function() getAuthHeader;
 
   /// return when SocketException
   final String Function() defaultErrorMessage;
@@ -441,7 +441,7 @@ class ApiManager {
   }) async {
     final Map<String, String> _headers = <String, String>{
       ...headers,
-      ...auth ? await _tokenHeader() : <String, String>{}
+      ...auth ? await getAuthHeader() : <String, String>{}
     };
     final String cacheHash = getCacheHash(url, method, _headers, body: body);
     try {
@@ -498,12 +498,6 @@ class ApiManager {
       return await _getFromPersistenceCache(cacheHash);
     }
     return null;
-  }
-
-  FutureOr<Map<String, String>> _tokenHeader() async {
-    final String token = await getUserToken();
-    final String bearerToken = 'Bearer $token';
-    return <String, String>{'Authorization': bearerToken};
   }
 
   String _handleError(

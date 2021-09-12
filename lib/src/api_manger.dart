@@ -424,7 +424,10 @@ class ApiManager {
 
   String getCacheHash(String url, String method, Map<String, String> headers,
       {dynamic body}) {
-    return '$url+ $method+ $headers+ $body'.toLowerCase();
+    final allPram = '$url+ $method+ $headers+ $body';
+    var hashedStr =
+        base64.encode(utf8.encode(allPram)).split('').toSet().join('');
+    return '$url+ $hashedStr';
   }
 
   Future<Response<dynamic>> _sendRequestImpl(

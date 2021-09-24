@@ -427,7 +427,8 @@ class ApiManager {
     final allPram = '$url+ $method+ $headers+ $body';
     var hashedStr =
         base64.encode(utf8.encode(allPram)).split('').toSet().join('');
-    return '$url+ $hashedStr';
+    var hashedUrl = base64.encode(utf8.encode(url)).split('').toSet().join('');
+    return '$hashedUrl+ $hashedStr';
   }
 
   Future<Response<dynamic>> _sendRequestImpl(

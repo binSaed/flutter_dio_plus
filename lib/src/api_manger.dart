@@ -36,6 +36,7 @@ class ApiManager {
     @required this.errorGeneralParser,
     @required this.apiCacheDB,
     @required this.getAuthHeader,
+    @required this.getDefaultHeader,
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
     this.isDevelopment = false,
@@ -82,6 +83,9 @@ class ApiManager {
 
   ///send when auth=true
   final FutureOr<Map<String, String>> Function() getAuthHeader;
+
+  ///use it when u need to send header Like [accept language]
+  final FutureOr<Map<String, String>> Function() getDefaultHeader;
 
   /// return when SocketException
   final String Function() defaultErrorMessage;
@@ -440,7 +444,8 @@ class ApiManager {
   }) async {
     final Map<String, String> _headers = <String, String>{
       ...headers,
-      ...auth ? await getAuthHeader() : <String, String>{}
+      ...auth ? await getAuthHeader() : <String, String>{},
+      ...await getDefaultHeader(),
     };
     final String cacheHash = _getCacheHash(url, method, _headers, body: body);
     try {

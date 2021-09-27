@@ -68,7 +68,7 @@ class ApiManager {
       }
 
       if (onNetworkChanged != null) onNetworkChanged(_connected);
-      if (_connected) notifyRefreshListeners();
+      if (_connected) _notifyRefreshListeners();
     });
   }
 
@@ -92,7 +92,7 @@ class ApiManager {
   /// if ur backend used the same error structure
   /// u need to define how to parsing it
   /// also, u can override it in every request
-  final String Function(dynamic body) errorGeneralParser;
+  final String Function(dynamic body, int statusCode) errorGeneralParser;
 
   /// listen to network connectivity
   /// true == connected to wifi or mobile network
@@ -119,7 +119,7 @@ class ApiManager {
     }
   }
 
-  void notifyRefreshListeners() {
+  void _notifyRefreshListeners() {
     if (_refreshListeners.isEmpty) return;
 
     final List<_RefreshListenerEntry> localListeners =
@@ -136,11 +136,6 @@ class ApiManager {
     }
   }
 
-  Map<String, String> headersWithBearerToken(String token,
-      {Map<String, String> otherHeaders = const <String, String>{}}) {
-    return <String, String>{'Authorization': 'Bearer $token', ...otherHeaders};
-  }
-
   Future<ResponseApi<T>> post<T>(
     String url,
     T Function(dynamic body) parserFunction, {
@@ -150,7 +145,7 @@ class ApiManager {
     bool queue = false,
     dynamic postBody,
     ProgressCallback onSendProgress,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(
@@ -168,7 +163,7 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        parse(body, parserFunction),
+        _parse(body, parserFunction),
         response,
         defaultErrorMessage(),
       );
@@ -193,7 +188,7 @@ class ApiManager {
     bool queue = false,
     dynamic dataBody,
     ProgressCallback onSendProgress,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(
@@ -211,7 +206,7 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        parse(body, parserFunction),
+        _parse(body, parserFunction),
         response,
         defaultErrorMessage(),
       );
@@ -233,7 +228,7 @@ class ApiManager {
     bool queue = false,
     dynamic dataBody,
     ProgressCallback onSendProgress,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(
@@ -251,7 +246,7 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        parse(body, parserFunction),
+        _parse(body, parserFunction),
         response,
         defaultErrorMessage(),
       );
@@ -274,7 +269,7 @@ class ApiManager {
     Map<String, String> headers = const <String, String>{},
     bool auth = false,
     bool queue = false,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(
@@ -291,7 +286,7 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        parse(body, parserFunction),
+        _parse(body, parserFunction),
         response,
         defaultErrorMessage(),
       );
@@ -313,7 +308,7 @@ class ApiManager {
     bool queue = false,
     bool memoryCache = false,
     bool persistenceCache = false,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(
@@ -331,7 +326,7 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        parse(body, parserFunction),
+        _parse(body, parserFunction),
         response,
         defaultErrorMessage(),
       );
@@ -352,7 +347,7 @@ class ApiManager {
     bool auth = false,
     bool queue = false,
     dynamic dataBody,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     try {
       final Response<dynamic> response = await _sendRequestImpl(url,
@@ -367,13 +362,13 @@ class ApiManager {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-          parse(body, parserFunction), response, defaultErrorMessage());
+          _parse(body, parserFunction), response, defaultErrorMessage());
     } catch (e) {
       return ResponseApi<T>.error(e, e?.response, defaultErrorMessage());
     }
   }
 
-  T parse<T>(dynamic body, T Function(dynamic body) parserFunction) {
+  T _parse<T>(dynamic body, T Function(dynamic body) parserFunction) {
     if (parserFunction == null) return body;
 
     try {
@@ -422,7 +417,7 @@ class ApiManager {
     }
   }
 
-  String getCacheHash(String url, String method, Map<String, String> headers,
+  String _getCacheHash(String url, String method, Map<String, String> headers,
       {dynamic body}) {
     final allPram = '$url+ $method+ $headers+ $body';
     var hashedStr =
@@ -441,13 +436,13 @@ class ApiManager {
     bool queue = false,
     ProgressCallback onSendProgress,
     dynamic body,
-    String Function(dynamic body) errorParser,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
     final Map<String, String> _headers = <String, String>{
       ...headers,
       ...auth ? await getAuthHeader() : <String, String>{}
     };
-    final String cacheHash = getCacheHash(url, method, _headers, body: body);
+    final String cacheHash = _getCacheHash(url, method, _headers, body: body);
     try {
       if (memoryCache) {
         final dynamic dataFromCache = _getFromMemoryCache(cacheHash);
@@ -504,12 +499,12 @@ class ApiManager {
     return null;
   }
 
-  String _handleError(
-      dynamic exception, String Function(dynamic body) errorParser) {
+  String _handleError(dynamic exception,
+      String Function(dynamic body, int statusCode) errorParser) {
     final Response<dynamic> response = exception?.response;
     dynamic responseBody;
     String error = defaultErrorMessage();
-
+    final statusCode = response.statusCode;
     if (exception is DioError) {
       if (exception.error is SocketException) {
         throw NetworkApiException(
@@ -517,7 +512,7 @@ class ApiManager {
       }
       try {
         responseBody = response?.data;
-        error = errorParser(responseBody) ?? defaultErrorMessage();
+        error = errorParser(responseBody, statusCode) ?? defaultErrorMessage();
       } catch (e) {
         throw NetworkApiException(error, response, defaultErrorMessage());
       }

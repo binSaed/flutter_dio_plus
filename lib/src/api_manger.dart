@@ -87,7 +87,7 @@ class ApiManager {
   ///use it when u need to send header Like [accept language]
   final FutureOr<Map<String, String>> Function() getDefaultHeader;
 
-  /// return when SocketException
+  /// return when errorGeneralParser or errorParser return null
   final String Function() defaultErrorMessage;
 
   /// return when SocketException

@@ -509,7 +509,7 @@ class ApiManager {
     final Response<dynamic> response = exception?.response;
     dynamic responseBody;
     String error = defaultErrorMessage();
-    final statusCode = response.statusCode;
+    final statusCode = response?.statusCode;
     if (exception is DioError) {
       if (exception.error is SocketException) {
         throw NetworkApiException(

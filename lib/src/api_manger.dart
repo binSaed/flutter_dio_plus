@@ -29,7 +29,7 @@ Future<dynamic> _parseJsonCompute(String text) {
 }
 
 class ApiManager {
-  bool _firstCall = true;
+  DateTime _firstCallTime;
 
   ApiManager(
     this._dio, {
@@ -46,6 +46,7 @@ class ApiManager {
     int largeResponseLength = 100000,
     this.onNetworkChanged,
   }) {
+    _firstCallTime = DateTime.now();
     if (isDevelopment) {
       _dio.interceptors.add(LogInterceptor(
         requestHeader: true,
@@ -61,15 +62,14 @@ class ApiManager {
     };
 
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      final bool _connected = result != ConnectivityResult.none;
-      if (_firstCall) {
-        _firstCall = false;
-
-        if (!_connected) return;
+      // to ignore onNetworkChanged in firstCall
+      if (DateTime.now().isAfter(
+        _firstCallTime.add(const Duration(milliseconds: 500)),
+      )) {
+        final bool _connected = result != ConnectivityResult.none;
+        if (onNetworkChanged != null) onNetworkChanged(_connected);
+        if (_connected) _notifyRefreshListeners();
       }
-
-      if (onNetworkChanged != null) onNetworkChanged(_connected);
-      if (_connected) _notifyRefreshListeners();
     });
   }
 

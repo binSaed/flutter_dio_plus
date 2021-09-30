@@ -444,8 +444,8 @@ class ApiManager {
   }) async {
     final Map<String, String> _headers = <String, String>{
       ...headers,
-      ...auth ? await getAuthHeader() : <String, String>{},
-      ...await getDefaultHeader(),
+      ...auth ? await getAuthHeader?.call() ?? {} : <String, String>{},
+      ...await getDefaultHeader?.call() ?? {},
     };
     final String cacheHash = _getCacheHash(url, method, _headers, body: body);
     try {

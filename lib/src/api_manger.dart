@@ -65,7 +65,7 @@ class ApiManager {
       if (_firstCall) {
         _firstCall = false;
 
-        if (_connected) return;
+        if (!_connected) return;
       }
 
       if (onNetworkChanged != null) onNetworkChanged(_connected);

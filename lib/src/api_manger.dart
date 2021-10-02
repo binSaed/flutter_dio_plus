@@ -13,12 +13,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
-class _RefreshListenerEntry extends LinkedListEntry<_RefreshListenerEntry> {
-  _RefreshListenerEntry(this.listener);
-
-  final VoidCallback listener;
-}
-
 // Must be top-level function
 dynamic _parseAndDecode(String response) {
   return jsonDecode(response);
@@ -68,7 +62,6 @@ class ApiManager {
       )) {
         final bool _connected = result != ConnectivityResult.none;
         if (onNetworkChanged != null) onNetworkChanged(_connected);
-        if (_connected) _notifyRefreshListeners();
       }
     });
   }
@@ -105,40 +98,6 @@ class ApiManager {
 
   /// used to save response in memory
   final Map<String, dynamic> _httpCaching = HashMap<String, dynamic>();
-
-  /// used to retry failed ResponseApiBuilder requests when internet comeback
-  final LinkedList<_RefreshListenerEntry> _refreshListeners =
-      LinkedList<_RefreshListenerEntry>();
-
-  void addRefreshListener(VoidCallback listener) {
-    _refreshListeners.add(_RefreshListenerEntry(listener));
-  }
-
-  void removeRefreshListener(VoidCallback listener) {
-    for (final _RefreshListenerEntry entry in _refreshListeners) {
-      if (entry.listener == listener) {
-        entry.unlink();
-        return;
-      }
-    }
-  }
-
-  void _notifyRefreshListeners() {
-    if (_refreshListeners.isEmpty) return;
-
-    final List<_RefreshListenerEntry> localListeners =
-        List<_RefreshListenerEntry>.from(_refreshListeners);
-
-    for (final _RefreshListenerEntry entry in localListeners) {
-      try {
-        if (entry.list != null) entry.listener();
-      } catch (exception, _) {
-        if (isDevelopment) {
-          print('ApiManger: notifyRefreshListeners=> $exception');
-        }
-      }
-    }
-  }
 
   Future<ResponseApi<T>> post<T>(
     String url,

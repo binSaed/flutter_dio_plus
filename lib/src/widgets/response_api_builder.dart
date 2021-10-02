@@ -111,7 +111,7 @@ class ResponseApiBuilderState<T> extends State<ResponseApiBuilder<T>> {
     if (isLoading) {
       if (widget.dataAndLoadingBuilder != null) {
         return widget.dataAndLoadingBuilder(
-            context, res.data, !isDone, refresh);
+            context, res?.data, !isDone, refresh);
       }
       return widget.loadingBuilder(context);
     }

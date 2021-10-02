@@ -393,7 +393,7 @@ class ApiManager {
 
   Future<Response<dynamic>> _getFromPersistenceCache(String hash) async {
     try {
-      return responseFromRawJson(await apiCacheDB.get(hash));
+      return responseFromRawJson(await apiCacheDB?.get(hash));
     } catch (e) {
       if (isDevelopment) print('ApiManger: _getFromPersistenceCache=> $e');
 
@@ -414,7 +414,7 @@ class ApiManager {
   Future<void> _saveToPersistenceCache(
       Response<dynamic> res, String hash) async {
     if (_validResponse(res.statusCode)) {
-      await apiCacheDB.add(
+      await apiCacheDB?.add(
         hash,
         responseToRawJson(res),
       );

@@ -148,16 +148,16 @@ class ResponseApiBuilderState<T> extends State<ResponseApiBuilder<T>> {
   }
 
   bool isNoData(ResponseApi<T> res, bool Function(T body) noDataChecker) {
-    if (res.isNoData) return true;
-
     final _data = res?.data;
+
+    if (noDataChecker != null) return noDataChecker(_data);
+
+    if (res.isNoData) return true;
 
     if (_data == null) return true;
 
     if (_data.runtimeType.toString().startsWith('List') &&
         (_data as List).isEmpty) return true;
-
-    if ((noDataChecker ?? (_) => false)(_data)) return true;
 
     return false;
   }

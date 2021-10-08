@@ -55,10 +55,13 @@ class ApiManager {
       return _parseAndDecode(text);
     };
 
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    Connectivity()
+        .onConnectivityChanged
+        .distinct()
+        .listen((ConnectivityResult result) {
       // to ignore onNetworkChanged in firstCall
       if (DateTime.now().isAfter(
-        _firstCallTime.add(const Duration(milliseconds: 500)),
+        _firstCallTime.add(const Duration(seconds: 1)),
       )) {
         final bool _connected = result != ConnectivityResult.none;
         if (onNetworkChanged != null) onNetworkChanged(_connected);
@@ -94,7 +97,8 @@ class ApiManager {
   /// listen to network connectivity
   /// true == connected to wifi or mobile network
   /// false == no internet
-  final ValueChanged<bool> onNetworkChanged;
+  final void Function(bool connected, ConnectivityResult connectivityResult)
+      onNetworkChanged;
 
   /// used to save response in memory
   final Map<String, dynamic> _httpCaching = HashMap<String, dynamic>();

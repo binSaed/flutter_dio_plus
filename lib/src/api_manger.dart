@@ -58,13 +58,14 @@ class ApiManager {
     Connectivity()
         .onConnectivityChanged
         .distinct()
-        .listen((ConnectivityResult result) {
+        .listen((ConnectivityResult connectivityResult) {
       // to ignore onNetworkChanged in firstCall
       if (DateTime.now().isAfter(
         _firstCallTime.add(const Duration(seconds: 1)),
       )) {
-        final bool _connected = result != ConnectivityResult.none;
-        if (onNetworkChanged != null) onNetworkChanged(_connected);
+        final bool _connected = connectivityResult != ConnectivityResult.none;
+        if (onNetworkChanged != null)
+          onNetworkChanged(_connected, connectivityResult);
       }
     });
   }

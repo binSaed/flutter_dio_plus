@@ -120,9 +120,9 @@ class ApiManager {
         response,
         defaultErrorMessage(),
       );
-    } catch (e) {
+    } catch (e, stacktrace) {
       if (isDevelopment && (e is! NetworkApiException)) {
-        print('ApiManger: $e');
+        print('ApiManger: $e \n$stacktrace');
       }
       return ResponseApi<T>.error(
         e,
@@ -293,9 +293,10 @@ class ApiManager {
 
     try {
       return parserFunction(body);
-    } catch (e) {
+    } catch (e, stacktrace) {
       if (e is FormatException || e is TypeError || e is NoSuchMethodError) {
-        if (isDevelopment) print('ApiManger: parserFunction=> $e');
+        if (isDevelopment)
+          print('ApiManger: parserFunction=> $e \n$stacktrace');
 
         return throw NetworkApiException(null, null, defaultErrorMessage());
       }
@@ -310,8 +311,9 @@ class ApiManager {
   Future<Response<dynamic>> _getFromPersistenceCache(String hash) async {
     try {
       return responseFromRawJson(await apiCacheDB?.get(hash));
-    } catch (e) {
-      if (isDevelopment) print('ApiManger: _getFromPersistenceCache=> $e');
+    } catch (e, stacktrace) {
+      if (isDevelopment)
+        print('ApiManger: _getFromPersistenceCache=> $e \n$stacktrace');
 
       return null;
     }

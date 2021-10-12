@@ -61,7 +61,7 @@ class ApiManager {
         .listen((ConnectivityResult connectivityResult) {
       // to ignore onNetworkChanged in firstCall
       if (DateTime.now().isAfter(
-        _firstCallTime.add(const Duration(seconds: 1)),
+        _firstCallTime.add(const Duration(seconds: 2)),
       )) {
         final bool _connected = connectivityResult != ConnectivityResult.none;
         if (onNetworkChanged != null)
@@ -272,6 +272,7 @@ class ApiManager {
     T Function(dynamic body) parserFunction, {
     dynamic Function(dynamic body) editBody,
     Map<String, String> headers = const <String, String>{},
+    Map<String, String> queryParameters = const <String, String>{},
     bool auth = false,
     bool queue = false,
     bool memoryCache = false,
@@ -288,6 +289,7 @@ class ApiManager {
         persistenceCache: persistenceCache,
         method: 'GET',
         errorParser: errorParser,
+        queryParameters: queryParameters,
       );
       dynamic body = response.data;
       if (editBody != null) {
@@ -398,6 +400,7 @@ class ApiManager {
     String url, {
     @required String method,
     Map<String, String> headers = const <String, String>{},
+    Map<String, dynamic> queryParameters = const <String, String>{},
     bool auth = false,
     bool memoryCache = false,
     bool persistenceCache = false,
@@ -429,6 +432,7 @@ class ApiManager {
             ),
             data: body,
             onSendProgress: onSendProgress,
+            queryParameters: queryParameters,
           ),
         );
       } else {
@@ -437,6 +441,7 @@ class ApiManager {
           options: Options(headers: _headers, method: method),
           data: body,
           onSendProgress: onSendProgress,
+          queryParameters: queryParameters,
         );
       }
 

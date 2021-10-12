@@ -104,28 +104,13 @@ class ApiManager {
   /// used to save response in memory
   final Map<String, dynamic> _httpCaching = HashMap<String, dynamic>();
 
-  Future<ResponseApi<T>> post<T>(
-    String url,
-    T Function(dynamic body) parserFunction, {
+  Future<ResponseApi<T>> _guardSendRequest<T>({
+    Future<Response<dynamic>> Function() request,
     dynamic Function(dynamic body) editBody,
-    Map<String, String> headers = const <String, String>{},
-    bool auth = false,
-    bool queue = false,
-    dynamic postBody,
-    ProgressCallback onSendProgress,
-    String Function(dynamic body, int statusCode) errorParser,
+    T Function(dynamic body) parserFunction,
   }) async {
     try {
-      final Response<dynamic> response = await _sendRequestImpl(
-        url,
-        auth: auth,
-        headers: headers,
-        body: postBody,
-        queue: queue,
-        onSendProgress: onSendProgress,
-        method: 'POST',
-        errorParser: errorParser,
-      );
+      final response = await request();
       dynamic body = response.data;
       if (editBody != null) {
         body = editBody(body);
@@ -147,32 +132,30 @@ class ApiManager {
     }
   }
 
-  Future<ResponseApi<T>> guardSendRequest<T>({
-    Future<Response<dynamic>> Function() future,
+  Future<ResponseApi<T>> post<T>(
+    String url,
+    T Function(dynamic body) parserFunction, {
     dynamic Function(dynamic body) editBody,
-    T Function(dynamic body) parserFunction,
+    Map<String, String> headers = const <String, String>{},
+    bool auth = false,
+    bool queue = false,
+    dynamic postBody,
+    ProgressCallback onSendProgress,
+    String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final response = await future();
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
-      );
-    } catch (e) {
-      if (isDevelopment && (e is! NetworkApiException)) {
-        print('ApiManger: $e');
-      }
-      return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
-      );
-    }
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              body: postBody,
+              queue: queue,
+              onSendProgress: onSendProgress,
+              method: 'POST',
+              errorParser: errorParser,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   Future<ResponseApi<T>> patch<T>(
@@ -186,33 +169,19 @@ class ApiManager {
     ProgressCallback onSendProgress,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final Response<dynamic> response = await _sendRequestImpl(
-        url,
-        auth: auth,
-        headers: headers,
-        body: dataBody,
-        queue: queue,
-        onSendProgress: onSendProgress,
-        method: 'patch',
-        errorParser: errorParser,
-      );
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
-      );
-    } catch (e) {
-      return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
-      );
-    }
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              body: dataBody,
+              queue: queue,
+              onSendProgress: onSendProgress,
+              method: 'patch',
+              errorParser: errorParser,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   Future<ResponseApi<T>> put<T>(
@@ -226,33 +195,19 @@ class ApiManager {
     ProgressCallback onSendProgress,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final Response<dynamic> response = await _sendRequestImpl(
-        url,
-        auth: auth,
-        headers: headers,
-        body: dataBody,
-        queue: queue,
-        onSendProgress: onSendProgress,
-        method: 'PUT',
-        errorParser: errorParser,
-      );
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
-      );
-    } catch (e) {
-      return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
-      );
-    }
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              body: dataBody,
+              queue: queue,
+              onSendProgress: onSendProgress,
+              method: 'PUT',
+              errorParser: errorParser,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   ///first time get data from api and cache it in memory if statusCode >=200<300
@@ -267,32 +222,18 @@ class ApiManager {
     bool queue = false,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final Response<dynamic> response = await _sendRequestImpl(
-        url,
-        auth: auth,
-        headers: headers,
-        memoryCache: true,
-        queue: queue,
-        method: 'GET',
-        errorParser: errorParser,
-      );
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
-      );
-    } catch (e) {
-      return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
-      );
-    }
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              memoryCache: true,
+              queue: queue,
+              method: 'GET',
+              errorParser: errorParser,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   Future<ResponseApi<T>> get<T>(
@@ -307,8 +248,8 @@ class ApiManager {
     bool persistenceCache = false,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    return await guardSendRequest(
-        future: () => _sendRequestImpl(
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
               url,
               auth: auth,
               headers: headers,
@@ -333,23 +274,18 @@ class ApiManager {
     dynamic dataBody,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final Response<dynamic> response = await _sendRequestImpl(url,
-          auth: auth,
-          headers: headers,
-          queue: queue,
-          body: dataBody,
-          method: 'delete',
-          errorParser: errorParser);
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-          _parse(body, parserFunction), response, defaultErrorMessage());
-    } catch (e) {
-      return ResponseApi<T>.error(e, e?.response, defaultErrorMessage());
-    }
+    return await _guardSendRequest(
+        request: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              queue: queue,
+              body: dataBody,
+              method: 'delete',
+              errorParser: errorParser,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   T _parse<T>(dynamic body, T Function(dynamic body) parserFunction) {

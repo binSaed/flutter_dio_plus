@@ -46,7 +46,15 @@ class ApiManager {
         requestHeader: true,
         requestBody: true,
         responseBody: true,
-        logPrint: print,
+        logPrint: (object) {
+          if (object is FormData) {
+            print('fields: ${object.fields}');
+            print('files: ${object?.files?.map(
+              (e) => MapEntry(e?.key, e?.value?.filename),
+            )}');
+          }
+          print(object);
+        },
       ));
     }
 

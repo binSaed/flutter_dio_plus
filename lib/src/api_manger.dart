@@ -147,6 +147,34 @@ class ApiManager {
     }
   }
 
+  Future<ResponseApi<T>> guardSendRequest<T>({
+    Future<Response<dynamic>> Function() future,
+    dynamic Function(dynamic body) editBody,
+    T Function(dynamic body) parserFunction,
+  }) async {
+    try {
+      final response = await future();
+      dynamic body = response.data;
+      if (editBody != null) {
+        body = editBody(body);
+      }
+      return ResponseApi<T>.success(
+        _parse(body, parserFunction),
+        response,
+        defaultErrorMessage(),
+      );
+    } catch (e) {
+      if (isDevelopment && (e is! NetworkApiException)) {
+        print('ApiManger: $e');
+      }
+      return ResponseApi<T>.error(
+        e,
+        e?.response,
+        defaultErrorMessage(),
+      );
+    }
+  }
+
   Future<ResponseApi<T>> patch<T>(
     String url,
     T Function(dynamic body) parserFunction, {
@@ -279,34 +307,20 @@ class ApiManager {
     bool persistenceCache = false,
     String Function(dynamic body, int statusCode) errorParser,
   }) async {
-    try {
-      final Response<dynamic> response = await _sendRequestImpl(
-        url,
-        auth: auth,
-        headers: headers,
-        queue: queue,
-        memoryCache: memoryCache,
-        persistenceCache: persistenceCache,
-        method: 'GET',
-        errorParser: errorParser,
-        queryParameters: queryParameters,
-      );
-      dynamic body = response.data;
-      if (editBody != null) {
-        body = editBody(body);
-      }
-      return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
-      );
-    } catch (e) {
-      return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
-      );
-    }
+    return await guardSendRequest(
+        future: () => _sendRequestImpl(
+              url,
+              auth: auth,
+              headers: headers,
+              queue: queue,
+              memoryCache: memoryCache,
+              persistenceCache: persistenceCache,
+              method: 'GET',
+              errorParser: errorParser,
+              queryParameters: queryParameters,
+            ),
+        editBody: editBody,
+        parserFunction: parserFunction);
   }
 
   Future<ResponseApi<T>> delete<T>(

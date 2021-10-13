@@ -37,6 +37,9 @@ class ApiManager {
     @required this.networkErrorMessage,
     @required this.noDataMessage,
     @required this.retryBtnMessage,
+    @required this.connectionTimeOutMessage,
+    @required this.receivingTimeOutMessage,
+    @required this.sendingTimeOutMessage,
     this.isDevelopment = false,
 
     /// if response body Length > largeResponseLength package will parse response in another isolate(Thread)
@@ -99,6 +102,15 @@ class ApiManager {
 
   /// used with ResponseApiBuilder when req is not successful
   final String Function() retryBtnMessage;
+
+  /// When DioErrorType is connectTimeout
+  final String Function() connectionTimeOutMessage;
+
+  /// When DioErrorType is sendTimeout
+  final String Function() sendingTimeOutMessage;
+
+  /// When DioErrorType is receiveTimeout
+  final String Function() receivingTimeOutMessage;
 
   /// if ur backend used the same error structure
   /// u need to define how to parsing it
@@ -457,7 +469,31 @@ class ApiManager {
     if (exception is DioError) {
       if (exception.error is SocketException) {
         throw NetworkApiException(
-            networkErrorMessage(), null, defaultErrorMessage());
+          networkErrorMessage(),
+          null,
+          defaultErrorMessage(),
+        );
+      }
+      if (exception.type == DioErrorType.connectTimeout) {
+        throw NetworkApiException(
+          connectionTimeOutMessage?.call(),
+          response,
+          defaultErrorMessage(),
+        );
+      }
+      if (exception.type == DioErrorType.receiveTimeout) {
+        throw NetworkApiException(
+          receivingTimeOutMessage?.call(),
+          response,
+          defaultErrorMessage(),
+        );
+      }
+      if (exception.type == DioErrorType.sendTimeout) {
+        throw NetworkApiException(
+          sendingTimeOutMessage?.call(),
+          response,
+          defaultErrorMessage(),
+        );
       }
       try {
         responseBody = response?.data;

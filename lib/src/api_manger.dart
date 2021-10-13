@@ -13,6 +13,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
+import 'interceptors/interceptors.dart';
+
 // Must be top-level function
 dynamic _parseAndDecode(String response) {
   return jsonDecode(response);
@@ -42,19 +44,11 @@ class ApiManager {
   }) {
     _firstCallTime = DateTime.now();
     if (isDevelopment) {
-      _dio.interceptors.add(LogInterceptor(
+      _dio.interceptors.add(LogInterceptorX(
         requestHeader: true,
         requestBody: true,
         responseBody: true,
-        logPrint: (object) {
-          if (object is FormData) {
-            print('fields: ${object.fields}');
-            print('files: ${object?.files?.map(
-              (e) => MapEntry(e?.key, e?.value?.filename),
-            )}');
-          }
-          print(object);
-        },
+        logPrint: print,
       ));
     }
 

@@ -19,7 +19,7 @@ class ResponseApiBuilder<T> extends StatefulWidget {
   final ErrorBuilder errorBuilder;
   final NoDataChecker<T> noDataChecker;
   final String noDataMessage;
-  final String retryMessage;
+  final String retryBtnMessage;
   final bool refreshFailedReq;
 
   const ResponseApiBuilder({
@@ -34,8 +34,8 @@ class ResponseApiBuilder<T> extends StatefulWidget {
     this.noDataChecker,
     this.defaultData,
     this.refreshFailedReq = true,
-    this.noDataMessage = 'No Data',
-    this.retryMessage = 'Try again',
+    this.noDataMessage,
+    this.retryBtnMessage,
   }) : super(key: key);
 
   @override
@@ -121,21 +121,21 @@ class ResponseApiBuilderState<T> extends State<ResponseApiBuilder<T>> {
         context,
         res.error,
         refresh,
-        retryMessage: widget.retryMessage,
+        retryMessage: widget?.retryBtnMessage ?? res.retryBtnMessage,
         errorBuilder: widget.errorBuilder,
       );
     }
 
     if (isDone && isNoData(res, widget.noDataChecker)) {
       if (widget.noDataBuilder == null) {
-        return noDataWidgetHolder(widget.noDataMessage);
+        return noDataWidgetHolder(widget?.noDataMessage ?? res.noDataMessage);
       }
       return widget.noDataBuilder(context, refresh);
     }
 
     if (isNoData(res, widget.noDataChecker)) {
       if (widget.noDataBuilder == null) {
-        return noDataWidgetHolder(widget.noDataMessage);
+        return noDataWidgetHolder(widget?.noDataMessage ?? res.noDataMessage);
       }
       return widget.noDataBuilder(context, refresh);
     }

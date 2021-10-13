@@ -35,6 +35,8 @@ class ApiManager {
     @required this.getDefaultHeader,
     @required this.defaultErrorMessage,
     @required this.networkErrorMessage,
+    @required this.noDataMessage,
+    @required this.retryBtnMessage,
     this.isDevelopment = false,
 
     /// if response body Length > largeResponseLength package will parse response in another isolate(Thread)
@@ -92,6 +94,12 @@ class ApiManager {
   /// return when SocketException
   final String Function() networkErrorMessage;
 
+  /// used with ResponseApiBuilder when no data
+  final String Function() noDataMessage;
+
+  /// used with ResponseApiBuilder when req is not successful
+  final String Function() retryBtnMessage;
+
   /// if ur backend used the same error structure
   /// u need to define how to parsing it
   /// also, u can override it in every request
@@ -121,7 +129,9 @@ class ApiManager {
         data: _parse(body, parserFunction),
         response: res.response,
         dataSource: res.dataSource,
-        defaultErrorMessage: defaultErrorMessage(),
+        defaultErrorMessage: defaultErrorMessage?.call(),
+        noDataMessage: noDataMessage?.call(),
+        retryBtnMessage: retryBtnMessage?.call(),
       );
     } catch (e, stacktrace) {
       if (isDevelopment && (e is! NetworkApiException)) {
@@ -130,7 +140,9 @@ class ApiManager {
       return ResponseApi<T>.error(
         exception: e,
         response: e?.response,
-        defaultErrorMessage: defaultErrorMessage(),
+        defaultErrorMessage: defaultErrorMessage?.call(),
+        noDataMessage: noDataMessage?.call(),
+        retryBtnMessage: retryBtnMessage?.call(),
       );
     }
   }

@@ -14,6 +14,8 @@ class ResponseApi<T> {
     @required this.response,
     this.dataSource = DataSource.internet,
     this.defaultErrorMessage = 'error',
+    this.noDataMessage = 'No Data',
+    this.retryBtnMessage = 'Try again',
   }) : status = ApiStatus.success;
 
   ResponseApi.error({
@@ -21,6 +23,8 @@ class ResponseApi<T> {
     @required this.response,
     this.dataSource = DataSource.internet,
     this.defaultErrorMessage = 'error',
+    this.noDataMessage = 'No Data',
+    this.retryBtnMessage = 'Try again',
   }) : status = ApiStatus.error;
 
   T data;
@@ -30,6 +34,8 @@ class ResponseApi<T> {
   NetworkApiException exception;
 
   final String defaultErrorMessage;
+  final String noDataMessage;
+  final String retryBtnMessage;
 
   String get error => exception?.message ?? defaultErrorMessage;
 

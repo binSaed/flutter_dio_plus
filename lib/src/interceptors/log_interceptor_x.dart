@@ -71,10 +71,9 @@ class LogInterceptorX extends Interceptor {
       logPrint('data:');
       if (options.data is FormData) {
         _printAll(
-            'fields: ${options.data.fields.map((e) => {e.key: e.value})}');
-        _printAll('files: ${options.data.files.map(
-          (e) => {e.key: e.value.filename},
-        )}');
+            'fields:\n[${options.data.fields.map((e) => '{${e.key}: ${e.value}}').join(',\n')}]');
+        _printAll(
+            'files:\n[${options.data.files.map((e) => '{${e.key}: ${e.value.filename}}').join(',\n')}]');
       } else {
         _printAll(options.data);
       }

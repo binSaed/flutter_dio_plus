@@ -107,29 +107,30 @@ class ApiManager {
   final Map<String, dynamic> _httpCaching = HashMap<String, dynamic>();
 
   Future<ResponseApi<T>> _guardSendRequest<T>({
-    Future<Response<dynamic>> Function() request,
+    Future<_ResponseWithDataSource> Function() request,
     dynamic Function(dynamic body) editBody,
     T Function(dynamic body) parserFunction,
   }) async {
     try {
-      final response = await request();
-      dynamic body = response.data;
+      final res = await request();
+      dynamic body = res.response.data;
       if (editBody != null) {
         body = editBody(body);
       }
       return ResponseApi<T>.success(
-        _parse(body, parserFunction),
-        response,
-        defaultErrorMessage(),
+        data: _parse(body, parserFunction),
+        response: res.response,
+        dataSource: res.dataSource,
+        defaultErrorMessage: defaultErrorMessage(),
       );
     } catch (e, stacktrace) {
       if (isDevelopment && (e is! NetworkApiException)) {
         print('ApiManger: $e \n$stacktrace');
       }
       return ResponseApi<T>.error(
-        e,
-        e?.response,
-        defaultErrorMessage(),
+        exception: e,
+        response: e?.response,
+        defaultErrorMessage: defaultErrorMessage(),
       );
     }
   }
@@ -350,7 +351,7 @@ class ApiManager {
     return '$hashedUrl+ $hashedStr';
   }
 
-  Future<Response<dynamic>> _sendRequestImpl(
+  Future<_ResponseWithDataSource> _sendRequestImpl(
     String url, {
     @required String method,
     Map<String, String> headers = const <String, String>{},
@@ -372,7 +373,11 @@ class ApiManager {
     try {
       if (memoryCache) {
         final dynamic dataFromCache = _getFromMemoryCache(cacheHash);
-        if (dataFromCache != null) return dataFromCache;
+        if (dataFromCache != null)
+          return _ResponseWithDataSource(
+            response: dataFromCache,
+            dataSource: DataSource.memoryCache,
+          );
       }
 
       Response<dynamic> _res;
@@ -380,10 +385,7 @@ class ApiManager {
         _res = await ApiFutureQueue().run(
           () => _dio.request(
             url,
-            options: Options(
-              headers: _headers,
-              method: method,
-            ),
+            options: Options(headers: _headers, method: method),
             data: body,
             onSendProgress: onSendProgress,
             queryParameters: queryParameters,
@@ -401,14 +403,21 @@ class ApiManager {
 
       if (memoryCache) _saveToMemoryCache(_res, cacheHash);
       if (persistenceCache) await _saveToPersistenceCache(_res, cacheHash);
-      return _res;
+      return _ResponseWithDataSource(
+        response: _res,
+        dataSource: DataSource.internet,
+      );
     } catch (error) {
       final dynamic dataFromCache = await _getCacheIfSocketException(
         error,
         persistenceCache,
         cacheHash,
       );
-      if (dataFromCache != null) return dataFromCache;
+      if (dataFromCache != null)
+        return _ResponseWithDataSource(
+          response: dataFromCache,
+          dataSource: DataSource.persistenceCache,
+        );
 
       throw _handleError(error, errorParser ?? errorGeneralParser);
     }
@@ -455,4 +464,14 @@ class ApiManager {
         throw NetworkApiException(error, response, defaultErrorMessage());
     }
   }
+}
+
+class _ResponseWithDataSource {
+  final Response response;
+  final DataSource dataSource;
+
+  _ResponseWithDataSource({
+    @required this.response,
+    this.dataSource = DataSource.internet,
+  });
 }

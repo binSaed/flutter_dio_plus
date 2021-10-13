@@ -1,24 +1,37 @@
 import 'package:api_manger/src/network_api_exception.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+
+enum DataSource {
+  internet,
+  memoryCache,
+  persistenceCache,
+}
 
 class ResponseApi<T> {
-  ResponseApi.success(this.data, this.response,
-      [this._defaultErrorMessage = 'error'])
-      : status = ApiStatus.success;
+  ResponseApi.success({
+    @required this.data,
+    @required this.response,
+    this.dataSource = DataSource.internet,
+    this.defaultErrorMessage = 'error',
+  }) : status = ApiStatus.success;
 
-  ResponseApi.error(this._error, this.response,
-      [this._defaultErrorMessage = 'error'])
-      : status = ApiStatus.error;
+  ResponseApi.error({
+    @required this.exception,
+    @required this.response,
+    this.dataSource = DataSource.internet,
+    this.defaultErrorMessage = 'error',
+  }) : status = ApiStatus.error;
 
   T data;
-
+  DataSource dataSource = DataSource.internet;
   Response<dynamic> response;
 
-  NetworkApiException _error;
+  NetworkApiException exception;
 
-  final String _defaultErrorMessage;
+  final String defaultErrorMessage;
 
-  String get error => _error?.message ?? _defaultErrorMessage;
+  String get error => exception?.message ?? defaultErrorMessage;
 
   ApiStatus status;
 
@@ -35,9 +48,9 @@ class ResponseApi<T> {
   @override
   String toString() {
     if (status == ApiStatus.error) {
-      return 'Status: $status \nError: $error \nstatusCode: $statusCode';
+      return 'Status: $status \nError: $error \nstatusCode: $statusCode \n$dataSource';
     }
-    return 'Status: $status \nData: $data \nstatusCode: $statusCode';
+    return 'Status: $status \nData: $data \nstatusCode: $statusCode \n$dataSource';
   }
 }
 

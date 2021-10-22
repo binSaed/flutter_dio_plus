@@ -37,7 +37,10 @@ class ResponseApi<T> {
   final String noDataMessage;
   final String retryBtnMessage;
 
-  String get error => exception?.message ?? defaultErrorMessage;
+  String get error {
+    if ((exception?.message?.isEmpty ?? true)) return defaultErrorMessage;
+    return exception?.message;
+  }
 
   ApiStatus status;
 

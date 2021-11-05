@@ -3,11 +3,11 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:api_manger/src/api_util.dart';
-import 'package:api_manger/src/base_cache_api_db.dart';
-import 'package:api_manger/src/future_queue.dart';
-import 'package:api_manger/src/network_api_exception.dart';
-import 'package:api_manger/src/response_api.dart';
+import 'package:flutter_dio_plus/src/api_util.dart';
+import 'package:flutter_dio_plus/src/base_cache_api_db.dart';
+import 'package:flutter_dio_plus/src/future_queue.dart';
+import 'package:flutter_dio_plus/src/network_api_exception.dart';
+import 'package:flutter_dio_plus/src/response_api.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';

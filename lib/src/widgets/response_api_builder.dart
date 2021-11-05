@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:api_manger/api_manger.dart';
-import 'package:api_manger/src/utils/typedef.dart';
-import 'package:api_manger/src/widgets/error_widget_holder.dart';
-import 'package:api_manger/src/widgets/no_data_holder.dart';
-import 'package:api_manger/src/widgets/show_progress.dart';
+import 'package:flutter_dio_plus/flutter_dio_plus.dart';
+import 'package:flutter_dio_plus/src/utils/typedef.dart';
+import 'package:flutter_dio_plus/src/widgets/error_widget_holder.dart';
+import 'package:flutter_dio_plus/src/widgets/no_data_holder.dart';
+import 'package:flutter_dio_plus/src/widgets/show_progress.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 

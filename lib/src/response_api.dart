@@ -1,4 +1,4 @@
-import 'package:api_manger/src/network_api_exception.dart';
+import 'package:flutter_dio_plus/src/network_api_exception.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 

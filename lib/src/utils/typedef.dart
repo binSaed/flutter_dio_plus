@@ -1,4 +1,4 @@
-import 'package:api_manger/src/response_api.dart';
+import 'package:flutter_dio_plus/src/response_api.dart';
 import 'package:flutter/material.dart';
 
 typedef Refresh = void Function();

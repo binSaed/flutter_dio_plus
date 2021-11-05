@@ -1,7 +1,7 @@
-name: api_manger
+name: flutter_dio_plus
 description: "A flutter package to API handling like a super boss 😎."
 version: 0.0.10
-homepage: https://github.com/AbdOoSaed/api_manger
+homepage: https://github.com/AbdOoSaed/flutter_dio_plus
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -15,9 +15,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test: 1.16.8
-  mockito: 5.0.14
-  build_runner: 2.1.1
-  flutter_lints: ^1.0.4
+  test: ">=1.0.0 <2.0.0"
+  mockito: ">=5.0.0 <6.0.0"
+  build_runner: ">=2.0.0 <3.0.0"
+  flutter_lints: ">=1.0.0 <2.0.0"
 
 flutter:

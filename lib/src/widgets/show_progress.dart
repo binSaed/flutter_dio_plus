@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:api_manger/src/extensions/extensions.dart';
+import 'package:flutter_dio_plus/src/extensions/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

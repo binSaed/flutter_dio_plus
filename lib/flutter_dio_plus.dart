@@ -1,4 +1,4 @@
-export 'src/api_manger.dart';
+export 'src/flutter_dio_plus.dart';
 export 'src/api_util.dart';
 export 'src/base_cache_api_db.dart';
 export 'src/extensions/file.dart';

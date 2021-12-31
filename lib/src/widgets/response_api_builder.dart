@@ -1,12 +1,11 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dio_plus/flutter_dio_plus.dart';
-import 'package:flutter_dio_plus/src/utils/typedef.dart';
 import 'package:flutter_dio_plus/src/widgets/error_widget_holder.dart';
 import 'package:flutter_dio_plus/src/widgets/no_data_holder.dart';
 import 'package:flutter_dio_plus/src/widgets/show_progress.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 
 class ResponseApiBuilder<T> extends StatefulWidget {
   final ApiReq<T> future;
@@ -47,6 +46,7 @@ class ResponseApiBuilderState<T> extends State<ResponseApiBuilder<T>> {
       ValueNotifier<ResponseApi<T>>(null);
 
   void refresh() {
+    if (_isLoading) return;
     _getReq();
   }
 
@@ -75,8 +75,9 @@ class ResponseApiBuilderState<T> extends State<ResponseApiBuilder<T>> {
           .onConnectivityChanged
           .listen((ConnectivityResult result) {
         final bool _connected = result != ConnectivityResult.none;
-        if (_connected && (_notifier?.value?.hasErrorOrNoData ?? true))
-          _getReq();
+        if (_connected && (_notifier?.value?.hasErrorOrNoData ?? true)) {
+          refresh();
+        }
       });
     }
     super.initState();

@@ -3,15 +3,15 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:crypto/crypto.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dio_plus/src/api_util.dart';
 import 'package:flutter_dio_plus/src/base_cache_api_db.dart';
 import 'package:flutter_dio_plus/src/future_queue.dart';
 import 'package:flutter_dio_plus/src/network_api_exception.dart';
 import 'package:flutter_dio_plus/src/response_api.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 
 import 'interceptors/interceptors.dart';
 
@@ -369,10 +369,12 @@ class ApiManager {
   String _getCacheHash(String url, String method, Map<String, String> headers,
       {dynamic body}) {
     final allPram = '$url+ $method+ $headers+ $body';
-    var hashedStr =
-        base64.encode(utf8.encode(allPram)).split('').toSet().join('');
-    var hashedUrl = base64.encode(utf8.encode(url)).split('').toSet().join('');
-    return '$hashedUrl+ $hashedStr';
+
+    return _generateMd5(allPram);
+  }
+
+  String _generateMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
   }
 
   Future<_ResponseWithDataSource> _sendRequestImpl(

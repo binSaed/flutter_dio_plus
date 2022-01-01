@@ -24,10 +24,8 @@ Future<dynamic> _parseJsonCompute(String text) {
   return compute(_parseAndDecode, text);
 }
 
-class ApiManager {
-  DateTime _firstCallTime;
-
-  ApiManager(
+class DioPlus {
+  DioPlus(
     this._dio, {
     @required this.errorGeneralParser,
     @required this.apiCacheDB,
@@ -47,7 +45,6 @@ class ApiManager {
     int largeResponseLength = 100000,
     this.onNetworkChanged,
   }) {
-    _firstCallTime = DateTime.now();
     if (isDevelopment) {
       _dio.interceptors.add(LogInterceptorX(
         requestHeader: true,
@@ -66,13 +63,9 @@ class ApiManager {
         .onConnectivityChanged
         .distinct()
         .listen((ConnectivityResult connectivityResult) {
-      // to ignore onNetworkChanged in firstCall
-      if (DateTime.now().isAfter(
-        _firstCallTime.add(const Duration(seconds: 2)),
-      )) {
-        final bool _connected = connectivityResult != ConnectivityResult.none;
-        if (onNetworkChanged != null)
-          onNetworkChanged(_connected, connectivityResult);
+      final bool _connected = connectivityResult != ConnectivityResult.none;
+      if (onNetworkChanged != null) {
+        onNetworkChanged(_connected, connectivityResult);
       }
     });
   }

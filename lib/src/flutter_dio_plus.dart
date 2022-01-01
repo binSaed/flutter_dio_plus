@@ -28,7 +28,7 @@ class DioPlus {
   DioPlus(
     this._dio, {
     @required this.errorGeneralParser,
-    @required this.apiCacheDB,
+    @required this.persistenceCacheDB,
     @required this.getAuthHeader,
     @required this.getDefaultHeader,
     @required this.defaultErrorMessage,
@@ -42,6 +42,7 @@ class DioPlus {
 
     /// if response body Length > largeResponseLength package will parse response in another isolate(Thread)
     /// may take much time but it will improve rendering performance
+    /// see my last comment about it in Linkedin => https://bit.ly/3pGcyzC
     int largeResponseLength = 100000,
     this.onNetworkChanged,
   }) {
@@ -58,15 +59,16 @@ class DioPlus {
       if (text.length > largeResponseLength) return _parseJsonCompute(text);
       return _parseAndDecode(text);
     };
+    // to ignore onNetworkChanged in firstCall
+    Future.delayed(const Duration(seconds: 2)).then((_) {
+      Connectivity()
+          .onConnectivityChanged
+          .distinct()
+          .listen((ConnectivityResult connectivityResult) {
+        final bool _connected = connectivityResult != ConnectivityResult.none;
 
-    Connectivity()
-        .onConnectivityChanged
-        .distinct()
-        .listen((ConnectivityResult connectivityResult) {
-      final bool _connected = connectivityResult != ConnectivityResult.none;
-      if (onNetworkChanged != null) {
-        onNetworkChanged(_connected, connectivityResult);
-      }
+        onNetworkChanged?.call(_connected, connectivityResult);
+      });
     });
   }
 
@@ -76,7 +78,7 @@ class DioPlus {
   final bool isDevelopment;
 
   /// used to make persistenceCache
-  final BaseApiCacheDb apiCacheDB;
+  final BaseApiCacheDb persistenceCacheDB;
 
   ///send when auth=true
   final FutureOr<Map<String, String>> Function() getAuthHeader;
@@ -330,10 +332,11 @@ class DioPlus {
 
   Future<Response<dynamic>> _getFromPersistenceCache(String hash) async {
     try {
-      return responseFromRawJson(await apiCacheDB?.get(hash));
+      return responseFromRawJson(await persistenceCacheDB?.get(hash));
     } catch (e, stacktrace) {
-      if (isDevelopment)
+      if (isDevelopment) {
         print('ApiManger: _getFromPersistenceCache=> $e \n$stacktrace');
+      }
 
       return null;
     }
@@ -352,7 +355,7 @@ class DioPlus {
   Future<void> _saveToPersistenceCache(
       Response<dynamic> res, String hash) async {
     if (_validResponse(res.statusCode)) {
-      await apiCacheDB?.add(
+      await persistenceCacheDB?.add(
         hash,
         responseToRawJson(res),
       );

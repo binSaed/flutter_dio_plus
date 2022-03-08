@@ -8,10 +8,13 @@
 ![last-commit](https://img.shields.io/github/last-commit/AbdOoSaed/flutter_dio_plus)
 ![stars](https://img.shields.io/github/stars/AbdOoSaed/flutter_dio_plus?style=social)
 ![Dart CI](https://github.com/AbdOoSaed/flutter_dio_plus/workflows/Dart%20CI/badge.svg)
+
 [![support](https://img.shields.io/badge/platform-flutter%7Cflutter%20web%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/AbdOoSaed/flutter_dio_plus)
 
+<p align="center">
+<img src="https://user-images.githubusercontent.com/33700292/157297452-f89a7548-d227-404f-a90b-5ee50e4f04fd.png" alt="Dio plus Logo"  style="display: block;margin-left: auto;margin-right: auto;width: 50%;">
+</p>
 
-![Dio plus Logo](https://user-images.githubusercontent.com/33700292/157297452-f89a7548-d227-404f-a90b-5ee50e4f04fd.png)
 
 
 A flutter package to API handling like a super boss 😎.

@@ -11,7 +11,7 @@
 [![support](https://img.shields.io/badge/platform-flutter%7Cflutter%20web%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/AbdOoSaed/flutter_dio_plus)
 
 
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+![Dio plus Logo](https://user-images.githubusercontent.com/33700292/157297452-f89a7548-d227-404f-a90b-5ee50e4f04fd.png)
 
 
 A flutter package to API handling like a super boss 😎.

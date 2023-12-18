@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
   dio: ">=4.0.0 <5.0.0"
   connectivity_plus: ">=1.0.0 <2.0.0"
-  hive_flutter:
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -114,15 +114,18 @@ instantiate DioPlus
 send request
 
 ```dart
-final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
-"/path",
-(body) => UserModel.fromJson(body),
-queryParameters: {"id": "1"},
-auth: false,    // Send auth headers in this request or not.
-memoryCache: true,    // Save response in memory Cache
-persistenceCache: true,    // Save response in persistence Cache
-queue: false, // Wait for the same request to end to send another
-);
+    final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
+      "/path",
+      (body) => UserModel.fromJson(body),
+      queryParameters: {"id": "1"},
+      auth: false,
+      // Send auth headers in this request or not.
+      memoryCache: true,
+      // Save response in memory Cache
+      persistenceCache: true,
+      // Save response in persistence Cache
+      queue: false, // Wait for the same request to end to send another
+    );
 ```
 
 
@@ -143,7 +146,7 @@ This project is used by the following companies:
     <a href="https://www.paypal.me/abdoosaed/5" target="_blank">
    <img height=60 src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" >
     </a>
-    <br>    buy me a coffee by PayPal
+    <br>    Buy me a coffee by PayPal
 </p>
 
 

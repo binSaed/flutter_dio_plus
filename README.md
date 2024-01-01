@@ -114,9 +114,9 @@ instantiate DioPlus
 
 send request
 
-```flutter
-  final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
-"Path",
+```dart
+final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
+"/path",
 (body) => UserModel.fromJson(body),
 queryParameters: {"id": "1"},
 auth: false,    // Send auth headers in this request or not.
@@ -126,16 +126,13 @@ queue: false, // Wait for the same request to end to send another
 );
 ```
 
-## Demo
-
-Insert gif or link to demo
-
 
 ## Used By
 
 This project is used by the following companies:
 
-- [Happy Trip](https://github.com/Happy-Trip)
+- [Happy Trip](https://happytbooking.com/)
+- [iStoria](https://istoria.app)
 
 
 ## Support

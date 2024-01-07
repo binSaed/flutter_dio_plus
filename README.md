@@ -7,12 +7,11 @@
 ![license](https://img.shields.io/github/license/AbdOoSaed/flutter_dio_plus)
 ![last-commit](https://img.shields.io/github/last-commit/AbdOoSaed/flutter_dio_plus)
 ![stars](https://img.shields.io/github/stars/AbdOoSaed/flutter_dio_plus?style=social)
-![Dart CI](https://github.com/AbdOoSaed/flutter_dio_plus/workflows/Dart%20CI/badge.svg)
 
 [![support](https://img.shields.io/badge/platform-flutter%7Cflutter%20web%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/AbdOoSaed/flutter_dio_plus)
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/33700292/157306851-25e6a9d7-57dc-4d94-89d0-e94c756c23e5.png" alt="Dio plus Logo"  style="display: block;margin-left: auto;margin-right: auto;width: 50%;">
+<img src="https://user-images.githubusercontent.com/33700292/157306851-25e6a9d7-57dc-4d94-89d0-e94c756c23e5.png" alt="Dio plus Logo"  style="display: block;margin-left: auto;margin-right: auto;width: 22%;">
 </p>
 
 
@@ -114,16 +113,19 @@ instantiate DioPlus
 
 send request
 
-```flutter
-  final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
-"Path",
-(body) => UserModel.fromJson(body),
-queryParameters: {"id": "1"},
-auth: false,    // Send auth headers in this request or not.
-memoryCache: true,    // Save response in memory Cache
-persistenceCache: true,    // Save response in persistence Cache
-queue: false, // Wait for the same request to end to send another
-);
+```dart
+    final ResponseApi<UserModel> userModel = await _dioPlus.get<UserModel>(
+      "/path",
+      (body) => UserModel.fromJson(body),
+      queryParameters: {"id": "1"},
+      auth: false,
+      // Send auth headers in this request or not.
+      memoryCache: true,
+      // Save response in memory Cache
+      persistenceCache: true,
+      // Save response in persistence Cache
+      queue: false, // Wait for the same request to end to send another
+    );
 ```
 
 Check response status
@@ -148,7 +150,8 @@ Insert gif or link to demo
 
 This project is used by the following companies:
 
-- [Happy Trip](https://github.com/Happy-Trip)
+- [Happy Trip](https://happytbooking.com/)
+- [iStoria](https://istoria.app)
 
 
 ## Support
@@ -160,7 +163,7 @@ This project is used by the following companies:
     <a href="https://www.paypal.me/abdoosaed/5" target="_blank">
    <img height=60 src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" >
     </a>
-    <br>    buy me a coffee by PayPal
+    <br>    Buy me a coffee by PayPal
 </p>
 
 

@@ -126,6 +126,19 @@ queue: false, // Wait for the same request to end to send another
 );
 ```
 
+Check response status
+
+```flutter
+  if (userModel.isSuccess) {
+    // run some code
+  } else if (userModel.hasError) {
+    // Show error
+  } else if (userModel.isNoData) {
+    // Show there is no data
+  }
+```
+
+
 ## Demo
 
 Insert gif or link to demo

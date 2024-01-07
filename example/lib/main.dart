@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dio_plus/flutter_dio_plus.dart';
 
 import 'cache_db_services.dart';
-import 'user_model.dart';
+import '../user_model.dart';
 
 void main() async {
   final CacheDbServices _cacheDbServices = CacheDbServices();
@@ -68,9 +68,20 @@ void main() async {
     "Path",
     (body) => UserModel.fromJson(body),
     queryParameters: {"id": "1"},
-    auth: false,    // Send auth headers in this request or not.
-    memoryCache: true,    // Save response in memory Cache
-    persistenceCache: true,    // Save response in persistence Cache
+    auth: false,
+    // Send auth headers in this request or not.
+    memoryCache: true,
+    // Save response in memory Cache
+    persistenceCache: true,
+    // Save response in persistence Cache
     queue: false, // Wait for the same request to end to send another
   );
+
+  if (userModel.isSuccess) {
+    // run some code
+  } else if (userModel.hasError) {
+    // Show error
+  } else if (userModel.isNoData) {
+    // Show there is no data
+  }
 }

@@ -141,30 +141,12 @@ Check response status
 ```
 
 
-## Demo
-
-Insert gif or link to demo
-
-
 ## Used By
 
 This project is used by the following companies:
 
 - [Happy Trip](https://happytbooking.com/)
 - [iStoria](https://istoria.app)
-
-
-## Support
-<p align="center">
-<a  href="https://ko-fi.com/abdosaed#paypalModal" target="_blank"><img src="https://www.ko-fi.com/img/githubbutton_sm.svg" alt="Buy Me A Coffee" height=60 ></a>
-</p>
-
-<p align="center">
-    <a href="https://www.paypal.me/abdoosaed/5" target="_blank">
-   <img height=60 src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" >
-    </a>
-    <br>    Buy me a coffee by PayPal
-</p>
 
 
 ## License
